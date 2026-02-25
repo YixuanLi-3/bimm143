@@ -1,2 +1,2 @@
 # bimm143
-Bioinfomatics Class
+Bioinformatics Class
