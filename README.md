@@ -1,6 +1,5 @@
 # bimm143
 Bioinformatics Class
+Author: Yixuan Li
 
->This repo is for my UCSD bioinformatics class. 
-
-> Ho
+>This website is for my UCSD bioinformatics class for Winter 2026. 
