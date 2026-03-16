@@ -21,7 +21,7 @@ https://bioboot.github.io/bimm143_W25/
 
 - Class 07: [Why, when and how of writing your own R functions](https://github.com/YixuanLi-3/bimm143/tree/main/Class07)
 
-- Class 08: [Introduction to machine learning for Bioinformatics](https://github.com/YixuanLi-3/bimm143/tree/main/Class08/08)
+- Class 08: [Introduction to machine learning for Bioinformatics](https://github.com/YixuanLi-3/bimm143/tree/main/Class08/Class8)
 
 - Class 09: [Project: Unsupervised learning mini-project](https://github.com/YixuanLi-3/bimm143/tree/main/Class09)
 
