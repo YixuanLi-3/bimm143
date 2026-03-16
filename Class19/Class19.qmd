@@ -1,0 +1,71 @@
+---
+title: "Class19"
+author: "Yixuan Li"
+format: html
+editor: visual
+---
+
+```{r}
+# Read sequences
+wt <- readLines("wt_healthy.prot")
+mut <- readLines("mutant_tumor.prot")
+
+# Remove FASTA headers if present
+wt <- wt[!grepl("^>", wt)]
+mut <- mut[!grepl("^>", mut)]
+
+# Collapse sequence lines
+wt_seq <- paste(wt, collapse = "")
+mut_seq <- paste(mut, collapse = "")
+
+# Split into amino acids
+wt_aa <- strsplit(wt_seq, "")[[1]]
+mut_aa <- strsplit(mut_seq, "")[[1]]
+
+# Find mutation positions
+pos <- which(wt_aa != mut_aa)
+
+# Format mutations (A130V style)
+mutations <- paste0(wt_aa[pos], pos, mut_aa[pos])
+
+# Print mutations
+cat(mutations, sep = "\n")
+```
+
+```{r}
+# Read sequences
+wt <- readLines("wt_healthy.prot")
+mut <- readLines("mutant_tumor.prot")
+
+# Remove FASTA headers
+wt <- wt[!grepl("^>", wt)]
+mut <- mut[!grepl("^>", mut)]
+
+# Collapse into single sequence
+wt_seq <- paste(wt, collapse = "")
+mut_seq <- paste(mut, collapse = "")
+
+# Keep only amino acid letters
+wt_seq <- gsub("[^A-Z]", "", wt_seq)
+mut_seq <- gsub("[^A-Z]", "", mut_seq)
+
+# Split into amino acids
+wt_aa <- strsplit(wt_seq, "")[[1]]
+mut_aa <- strsplit(mut_seq, "")[[1]]
+
+# Find mutations
+pos <- which(wt_aa != mut_aa)
+
+# Format mutations
+mutations <- paste0(wt_aa[pos], pos, mut_aa[pos])
+
+# Print
+cat(mutations, sep="\n")
+```
+
+
+
+
+
+
+

@@ -1,0 +1,202 @@
+---
+title: "Class17_AWS"
+author: "Yixuan Li"
+format: pdf
+editor: visual
+---
+
+###Class17. Analysis using AWS
+
+##Data in cloud
+
+Q1.
+
+> **Q**. What shell command can you use to view the top few files of your FASTQ file?
+>
+> **head SRR600956.fastq**
+
+> **Q**. What length are these sequence reads?
+>
+> 38
+
+> **Q**. Can you use the `grep` command to determine how many total reads are in this file?
+>
+> 25849655
+
+> **Q**. Does you number of reads from `grep` match the name of the last read in the file? If not why not?
+
+> Yes. The grep command counted 25,849,655 reads, which matches the index of the last read (`@SRR600956.25849655`). This indicates that the reads are sequentially numbered and none appear to be missing.
+
+
+>Q2. How would you check that these files with extension ‘.fastq’ actually look like what we expect for a FASTQ file? You could try printing the first few lines to the shell standard output:
+
+head SRR2156848_1.fastq
+
+>Q3. How could you check the number of sequences in each file?
+
+grep -c "^@" SRR2156848_1.fastq
+
+>Q4. Check your answer with the bottom of the file using the tail command and also check the matching mate pair FASTQ file. Do these numbers match? If so why or why not?
+
+tail SRR2156848_1.fastq
+
+>Q5. Download the other 3 datasets (SRR2156849, SRR2156850 and SRR2156851) we need for our analysis, first with prefetch and then process with fasterq-dump
+
+prefetch SRR2156849
+prefetch SRR2156850
+prefetch SRR2156851
+
+fasterq-dump SRR2156849
+fasterq-dump SRR2156850
+fasterq-dump SRR2156851
+
+>Q6. Can you run kallisto to print out its citation information?
+
+ubuntu@ip-172-31-12-70:~$ kallisto cite
+When using this program in your research, please cite
+
+  Bray, N. L., Pimentel, H., Melsted, P. & Pachter, L.
+  Near-optimal probabilistic RNA-seq quantification, 
+  Nature Biotechnology 34, 525-527(2016), doi:10.1038/nbt.3519
+  
+>Q7. Now run the quantification calculation for the remaining samples:
+
+kallisto quant -i hg19.ensembl -o SRR2156849_quant SRR2156849_1.fastq SRR2156849_2.fastq
+kallisto quant -i hg19.ensembl -o SRR2156850_quant SRR2156850_1.fastq SRR2156850_2.fastq
+kallisto quant -i hg19.ensembl -o SRR2156851_quant SRR2156851_1.fastq SRR2156851_2.fastq
+
+>Q8.Have a look at the TSV format versions of these files to understand their structure. What do you notice about these files contents?
+
+The `abundance.tsv` files contain transcript-level expression data. Each row is a transcript, with columns for transcript ID, transcript length, effective length, estimated counts, and TPM. The transcript IDs are the same across samples, but the counts and TPM values differ. Many transcripts have zero counts if they are not expressed.
+
+##Analyzing Data
+```{r}
+# -----------------------------
+# tximport-ready script
+# Automatically imports Kallisto results
+# -----------------------------
+
+library(tximport)
+library(rhdf5)
+
+# Set working directory to Desktop
+setwd("~/Desktop")  # change if your folders are elsewhere
+
+# List all *_quant folders
+folders <- dir(pattern="SRR21568.*_quant")
+if(length(folders) == 0){
+  stop("No *_quant folders found in the working directory!")
+}
+
+# Create sample names
+samples <- sub("_quant", "", folders)
+
+# Detect whether abundance.h5 exists; otherwise use abundance.tsv
+files <- sapply(folders, function(f){
+  h5file <- file.path(f, "abundance.h5")
+  tsvfile <- file.path(f, "abundance.tsv")
+  if(file.exists(h5file)){
+    return(h5file)
+  } else if(file.exists(tsvfile)){
+    return(tsvfile)
+  } else {
+    stop(paste("No abundance file found in folder:", f))
+  }
+})
+
+names(files) <- samples
+
+# Import with tximport
+txi.kallisto <- tximport(files, type="kallisto", txOut=TRUE)
+
+# Quick check
+head(txi.kallisto$counts)
+dim(txi.kallisto$counts)
+
+message("All samples successfully imported!")
+```
+
+
+```{r}
+head(txi.kallisto$counts)
+```
+
+```{r}
+colSums(txi.kallisto$counts)
+```
+
+
+```{r}
+sum(rowSums(txi.kallisto$counts)>0)
+
+```
+
+
+```{r}
+to.keep <- rowSums(txi.kallisto$counts) > 0
+kset.nonzero <- txi.kallisto$counts[to.keep,]
+```
+
+```{r}
+keep2 <- apply(kset.nonzero,1,sd)>0
+x <- kset.nonzero[keep2,]
+```
+
+```{r}
+pca <- prcomp(t(x), scale=TRUE)
+summary(pca)
+
+```
+Now we can use the first two principal components as a co-ordinate system for visualizing the summarized transcriptomic profiles of each sample:
+
+```{r}
+plot(pca$x[,1], pca$x[,2],
+     col=c("blue","blue","red","red"),
+     xlab="PC1", ylab="PC2", pch=16)
+```
+
+>Q. Use ggplot to make a similar figure of PC1 vs PC2 and a separate figure PC1 vs PC3 and PC2 vs PC3.
+
+```{r}
+library(ggplot2)
+
+# Suppose x is your counts or TPM matrix (samples as columns)
+pca <- prcomp(t(x), scale = TRUE)
+
+# Make a data frame with PCA scores
+pca_df <- as.data.frame(pca$x)
+pca_df$Sample <- colnames(x)  # sample names
+pca_df$Group <- c("A","A","B","B")  # assign groups/colors as in your base plot
+
+# PC1 vs PC2
+fig1 <- ggplot(pca_df, aes(x = PC1, y = PC2, color = Group, label = Sample)) +
+  geom_point(size = 2) +
+  geom_text(vjust = -0.5) +
+  theme_minimal() +
+  labs(title = "PCA: PC1 vs PC2", x = "PC1", y = "PC2")
+
+# PC1 vs PC3
+fig2 <- ggplot(pca_df, aes(x = PC1, y = PC3, color = Group, label = Sample)) +
+  geom_point(size = 2) +
+  geom_text(vjust = -0.5) +
+  theme_minimal() +
+  labs(title = "PCA: PC1 vs PC3", x = "PC1", y = "PC3")
+
+# PC2 vs PC3
+fig3 <- ggplot(pca_df, aes(x = PC2, y = PC3, color = Group, label = Sample)) +
+  geom_point(size = 2) +
+  geom_text(vjust = -0.5) +
+  theme_minimal() +
+  labs(title = "PCA: PC2 vs PC3", x = "PC2", y = "PC3")
+```
+
+```{r}
+fig1
+fig2
+fig3
+```
+
+
+
+
+
