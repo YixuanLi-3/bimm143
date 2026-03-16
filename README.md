@@ -45,4 +45,3 @@ https://bioboot.github.io/bimm143_W25/
 
 - Class 19: [Project: Investigating pertussis resurgence mini-project](https://github.com/YixuanLi-3/bimm143/tree/main/Class19)
 
-- Class 20: [Project: Cancer mutation analysis mini-project](https://github.com/YixuanLi-3/bimm143/tree/main/Class20)
