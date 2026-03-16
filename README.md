@@ -21,7 +21,7 @@ https://bioboot.github.io/bimm143_W25/
 
 - Class 07: [Why, when and how of writing your own R functions](https://github.com/YixuanLi-3/bimm143/tree/main/Class07)
 
-- Class 08: [Introduction to machine learning for Bioinformatics](https://github.com/YixuanLi-3/bimm143/tree/main/Class08)
+- Class 08: [Introduction to machine learning for Bioinformatics](https://github.com/YixuanLi-3/bimm143/tree/main/Class08/08)
 
 - Class 09: [Project: Unsupervised learning mini-project](https://github.com/YixuanLi-3/bimm143/tree/main/Class09)
 
@@ -31,7 +31,7 @@ https://bioboot.github.io/bimm143_W25/
 
 - Class 12: [Structural Bioinformatics (pt2 AlphaFold)](https://github.com/YixuanLi-3/bimm143/tree/main/Class12)
 
-- Class 13: [Genome informatics and high throughput sequencing](https://github.com/YixuanLi-3/bimm143/tree/main/Class13)
+- Class 13: [Genome informatics and high throughput sequencing](https://github.com/YixuanLi-3/bimm143/tree/main/Class%2013)
 
 - Class 14: [Transcriptomics, RNA-Seq analysis, and interpretation of gene lists](https://github.com/YixuanLi-3/bimm143/tree/main/Class14)
 
